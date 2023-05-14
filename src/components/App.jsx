@@ -1,88 +1,69 @@
-import React, { Component } from 'react';
+import React, { useState, useEffect } from 'react';
 import toast, { Toaster } from 'react-hot-toast';
-import { ContactsForm } from './ContactsForm/ContactsForm';
+import ContactsForm from './ContactsForm/ContactsForm';
 import { ContactsList } from './ContactsList/ContactsList';
 import { Filter } from './Filter/Filter';
 import { Title } from './Title/Title';
 import { FilterTitle } from './Title/FilterTitle';
 import { ContactsTitle } from './Title/ContactsTitle';
 
-export class App extends Component {
-  state = {
-    contacts: [],
-    filter: '',
-  };
-  handleAddContact = contact => {
-    if (this.state.contacts.some(item => item.name === contact.name)) {
+export function App() {
+  const [contacts, setContacts] = useState([]);
+  const [filter, setFilter] = useState('');
+
+  const handleAddContact = contact => {
+    if (contacts.some(item => item.name === contact.name)) {
       toast.error('Contact already exists');
       return true;
     }
-    this.setState(prevState => {
-      return {
-        contacts: [...prevState.contacts, contact],
-      };
-    });
+    setContacts(prevContacts => [...prevContacts, contact]);
     return false;
   };
 
-  handleDeleteContact = id => {
-    this.setState(prevState => {
-      return {
-        contacts: prevState.contacts.filter(contact => contact.id !== id),
-      };
-    });
-  };
-
-  handleChangeFilter = evt => {
-    this.setState({ filter: evt.target.value });
-  };
-
-  handleFilterContacts = () => {
-    return this.state.contacts.filter(contact =>
-      contact.name
-        .toLowerCase()
-        .includes(this.state.filter.toLowerCase().trim())
+  const handleDeleteContact = id => {
+    setContacts(prevContacts =>
+      prevContacts.filter(contact => contact.id !== id)
     );
   };
-  componentDidMount() {
-    // console.log('didMount');
+
+  const handleChangeFilter = evt => {
+    setFilter(evt.target.value);
+  };
+
+  const handleFilterContacts = () => {
+    return contacts.filter(contact =>
+      contact.name.toLowerCase().includes(filter.toLowerCase().trim())
+    );
+  };
+
+  useEffect(() => {
     const contacts = localStorage.getItem('contacts');
     const parsedContacts = JSON.parse(contacts);
-
     if (parsedContacts) {
-      // console.log('parsedContacts');
-      this.setState({ contacts: parsedContacts });
+      setContacts(parsedContacts);
     }
-  }
-  componentDidUpdate(prevProps, prevState) {
-    if (this.state.contacts !== prevState.contacts) {
-      // console.log('update');
-      localStorage.setItem('contacts', JSON.stringify(this.state.contacts));
-    }
-    // console.log(prevState);
-    // console.log(this.state);
-  }
+  }, []);
 
-  render() {
-    return (
-      <>
-        <div className="container">
-          <Title title="Phonebook" />
-          <ContactsForm addContact={this.handleAddContact} />
+  useEffect(() => {
+    localStorage.setItem('contacts', JSON.stringify(contacts));
+  }, [contacts]);
 
-          <ContactsTitle contactsTitle="Contacts" />
-          <FilterTitle filterTitle="Find contacts by name" />
-          <Filter
-            value={this.state.filter}
-            handleChange={this.handleChangeFilter}
-          />
-          <ContactsList
-            contacts={this.handleFilterContacts()}
-            deleteContact={this.handleDeleteContact}
-          />
-          <Toaster />
-        </div>
-      </>
-    );
-  }
+  return (
+    <>
+      <div className="container">
+        <Title title="Phonebook" />
+        <ContactsForm addContact={handleAddContact} />
+        <ContactsTitle contactsTitle="Contacts" />
+        <FilterTitle filterTitle="Find contacts by name" />
+        <Filter value={filter} handleChange={handleChangeFilter} />
+        <ContactsList
+          contacts={handleFilterContacts()}
+          deleteContact={handleDeleteContact}
+        />
+        <Toaster />
+      </div>
+    </>
+  );
 }
+
+export default App;

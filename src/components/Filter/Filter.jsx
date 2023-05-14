@@ -1,4 +1,4 @@
-import React from 'react';
+// import { useState } from 'react';
 import css from '../ContactsForm/ContactsForm.module.css';
 import propTypes from 'prop-types';
 
@@ -15,6 +15,8 @@ export function Filter({ handleChange, value }) {
     </div>
   );
 }
+
 Filter.propTypes = {
   value: propTypes.string,
+  handleChange: propTypes.func.isRequired,
 };
