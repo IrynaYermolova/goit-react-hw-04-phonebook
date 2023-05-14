@@ -7,8 +7,10 @@ import { Title } from './Title/Title';
 import { FilterTitle } from './Title/FilterTitle';
 import { ContactsTitle } from './Title/ContactsTitle';
 
+const LOCAL_STORAGE_KEY = 'contacts';
+
 export function App() {
-  const [contacts, setContacts] = useState([]);
+  const [contacts, setContacts] = useState(JSON.parse(window.localStorage.getItem(LOCAL_STORAGE_KEY )) ?? []);
   const [filter, setFilter] = useState('');
 
   const handleAddContact = contact => {
@@ -34,19 +36,27 @@ export function App() {
     return contacts.filter(contact =>
       contact.name.toLowerCase().includes(filter.toLowerCase().trim())
     );
-  };
+  }; 
+    
+  
 
   useEffect(() => {
-    const contacts = localStorage.getItem('contacts');
-    const parsedContacts = JSON.parse(contacts);
-    if (parsedContacts) {
-      setContacts(parsedContacts);
-    }
-  }, []);
+    window.localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(contacts));
+  });
+    
+    
+    
+  // useEffect(() => {
+  //   const contacts = localStorage.getItem('contacts');
+  //   const parsedContacts = JSON.parse(contacts);
+  //   if (parsedContacts) {
+  //     setContacts(parsedContacts);
+  //   }
+  // }, []);
 
-  useEffect(() => {
-    localStorage.setItem('contacts', JSON.stringify(contacts));
-  }, [contacts]);
+  // useEffect(() => {
+  //   localStorage.setItem('contacts', JSON.stringify(contacts));
+  // }, [contacts]);
 
   return (
     <>
